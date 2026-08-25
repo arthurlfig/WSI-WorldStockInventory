@@ -4,11 +4,11 @@
 -- Banco: MySQL / MariaDB
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS gestao_estoque
+CREATE DATABASE IF NOT EXISTS WSI
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE gestao_estoque;
+USE WSI;
 
 -- ============================================================
 -- USUÁRIOS DO SISTEMA (todos são gestores/admin, não há outros perfis)
