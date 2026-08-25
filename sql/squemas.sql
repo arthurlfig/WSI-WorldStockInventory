@@ -4,11 +4,11 @@
 -- Banco: MySQL / MariaDB
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS WSI
+CREATE DATABASE IF NOT EXISTS wsi
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE WSI;
+USE wsi;
 
 -- ============================================================
 -- USUÁRIOS DO SISTEMA (todos são gestores/admin, não há outros perfis)
