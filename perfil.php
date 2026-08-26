@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meu perfil — Gestão de Estoque</title>
+<title>Meu perfil — WSI</title>
 <style>
     :root {
         --bg: #14181f;
@@ -193,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
 <header>
-    <p class="eyebrow">Gestão de Estoque</p>
+    <p class="eyebrow">WSI</p>
     <nav>
         <a href="home.php">Início</a>
         <a href="logout.php">Sair</a>

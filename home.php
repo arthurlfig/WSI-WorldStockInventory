@@ -7,7 +7,7 @@ exigirLogin();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Início — Gestão de Estoque</title>
+<title>Início — WSI</title>
 <style>
     :root {
         --bg: #14181f;
@@ -65,7 +65,7 @@ exigirLogin();
 <body>
 
 <header>
-    <p class="eyebrow">Gestão de Estoque</p>
+    <p class="eyebrow">WSI</p>
     <div>
         <span style="color: var(--ink-dim); font-size: 13px; margin-right: 14px;">
             Olá, <?= htmlspecialchars($_SESSION['usuario_nome']) ?>

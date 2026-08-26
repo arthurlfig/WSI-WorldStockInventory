@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Entrar — Gestão de Estoque</title>
+<title>Entrar — WSI</title>
 <style>
     :root {
         --bg: #14181f;
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="card">
     <div class="card__header">
-        <p class="card__eyebrow">Gestão de Estoque</p>
+        <p class="card__eyebrow">WSI</p>
         <h1 class="card__title">Entrar</h1>
     </div>
     <form method="POST" action="">
