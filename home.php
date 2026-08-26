@@ -70,6 +70,7 @@ exigirLogin();
         <span style="color: var(--ink-dim); font-size: 13px; margin-right: 14px;">
             Olá, <?= htmlspecialchars($_SESSION['usuario_nome']) ?>
         </span>
+        <a href="perfil.php" style="margin-right: 14px;">Meu perfil</a>
         <a href="logout.php">Sair</a>
     </div>
 </header>
@@ -85,10 +86,10 @@ exigirLogin();
             <p>Adicionar um novo gestor ao sistema.</p>
         </a>
 
-        <a class="tile" href="index.php">
-            <p class="tile-eyebrow">Cosméticos</p>
-            <h2>Estoque de cosméticos</h2>
-            <p>Ver produtos, lotes e validades.</p>
+        <a class="tile" href="cadastro_produto.php">
+            <p class="tile-eyebrow">Produtos</p>
+            <h2>Cadastrar produto</h2>
+            <p>Roupas, cosméticos, brinquedos, jogos ou filmes.</p>
         </a>
 
         <a class="tile" href="#">
