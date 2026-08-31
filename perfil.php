@@ -99,108 +99,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu perfil — WSI</title>
-<style>
-    :root {
-        --bg: #14181f;
-        --panel: #1c222c;
-        --panel-border: #2b3340;
-        --ink: #e8ebf0;
-        --ink-dim: #8b96a8;
-        --accent: #4fb0a5;
-        --accent-dim: #35766f;
-        --danger: #e2665a;
-        --field-bg: #10141a;
-        --radius: 6px;
-        --mono: 'JetBrains Mono', 'Courier New', monospace;
-        --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body {
-        margin: 0; min-height: 100vh;
-        background: linear-gradient(180deg, rgba(79,176,165,0.06), transparent 320px), var(--bg);
-        color: var(--ink); font-family: var(--sans);
-    }
-    header {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 18px 32px; border-bottom: 1px solid var(--panel-border);
-    }
-    header .eyebrow {
-        font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
-        text-transform: uppercase; color: var(--accent); margin: 0;
-    }
-    header nav a {
-        color: var(--ink-dim); text-decoration: none; font-size: 13px; margin-left: 18px;
-    }
-    header nav a:hover { color: var(--accent); }
-
-    main {
-        max-width: 520px; margin: 0 auto; padding: 40px 20px 60px;
-        display: flex; flex-direction: column; gap: 20px;
-    }
-    main h1 { font-size: 24px; margin: 0 0 4px; }
-    main p.sub { color: var(--ink-dim); margin: 0 0 8px; font-size: 13px; }
-
-    .card {
-        background: var(--panel); border: 1px solid var(--panel-border);
-        border-radius: var(--radius); overflow: hidden;
-    }
-    .card__header {
-        padding: 16px 24px; border-bottom: 1px solid var(--panel-border);
-    }
-    .card__eyebrow {
-        font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
-        text-transform: uppercase; color: var(--accent); margin: 0;
-    }
-    form { padding: 18px 24px 24px; display: flex; flex-direction: column; gap: 14px; }
-
-    label {
-        font-size: 12px; color: var(--ink-dim); display: block; margin-bottom: 6px;
-        font-family: var(--mono); letter-spacing: 0.02em;
-    }
-    input {
-        width: 100%; background: var(--field-bg); border: 1px solid var(--panel-border);
-        color: var(--ink); padding: 10px 12px; border-radius: var(--radius);
-        font-size: 14px; font-family: var(--sans);
-    }
-    input:focus { outline: none; border-color: var(--accent); }
-    input:disabled { color: var(--ink-dim); }
-
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    button {
-        margin-top: 4px; background: var(--accent); color: #0b1210; border: none;
-        padding: 11px; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer;
-    }
-    button:hover { background: #62c1b6; }
-
-    .meta {
-        font-size: 12px; color: var(--ink-dim); padding: 0 24px 18px;
-        font-family: var(--mono);
-    }
-
-    .msg {
-        border-radius: var(--radius); padding: 12px 14px; font-size: 13px; margin-bottom: 4px;
-    }
-    .msg--success {
-        background: rgba(79,176,165,0.12); border: 1px solid var(--accent-dim); color: var(--accent);
-    }
-    .msg--error {
-        background: rgba(226,102,90,0.1); border: 1px solid var(--danger); color: var(--danger);
-    }
-    .msg--error ul { margin: 4px 0 0; padding-left: 18px; }
-</style>
+<link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
 
-<header>
-    <p class="eyebrow">WSI</p>
-    <nav>
-        <a href="home.php">Início</a>
-        <a href="logout.php">Sair</a>
-    </nav>
-</header>
+<?php include __DIR__ . '/partials/navbar.php'; ?>
 
-<main>
+<main class="main--narrow">
     <div>
         <h1>Meu perfil</h1>
         <p class="sub">Veja e edite suas informações de acesso.</p>

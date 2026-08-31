@@ -539,275 +539,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <title>Cadastro de Produto — WSI</title>
 
-<style>
-
-    :root {
-        --bg: #14181f;
-        --panel: #1c222c;
-        --panel-border: #2b3340;
-        --ink: #e8ebf0;
-        --ink-dim: #8b96a8;
-        --accent: #4fb0a5;
-        --accent-dim: #35766f;
-        --danger: #e2665a;
-        --field-bg: #10141a;
-        --radius: 6px;
-        --mono: 'JetBrains Mono', 'Courier New', monospace;
-        --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        min-height: 100vh;
-
-        background:
-            linear-gradient(
-                180deg,
-                rgba(79,176,165,0.06),
-                transparent 320px
-            ),
-            var(--bg);
-
-        color: var(--ink);
-        font-family: var(--sans);
-
-        padding: 32px 16px;
-    }
-
-    .card {
-        width: 100%;
-        max-width: 760px;
-
-        margin: 0 auto;
-
-        background: var(--panel);
-        border: 1px solid var(--panel-border);
-        border-radius: var(--radius);
-
-        overflow: hidden;
-    }
-
-    .card__header {
-        padding: 22px 28px 18px;
-        border-bottom: 1px solid var(--panel-border);
-    }
-
-    .card__eyebrow {
-        font-family: var(--mono);
-        font-size: 11px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-
-        color: var(--accent);
-
-        margin: 0 0 6px;
-    }
-
-    .card__title {
-        margin: 0;
-
-        font-size: 20px;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-    }
-
-    .card__subtitle {
-        margin: 6px 0 0;
-
-        font-size: 13px;
-        color: var(--ink-dim);
-    }
-
-    form {
-        padding: 22px 28px 28px;
-
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .section {
-        padding-bottom: 20px;
-
-        border-bottom: 1px solid var(--panel-border);
-    }
-
-    .section:last-of-type {
-        border-bottom: none;
-        padding-bottom: 0;
-    }
-
-    .section-title {
-        margin: 0 0 16px;
-
-        font-family: var(--mono);
-        font-size: 11px;
-
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-
-        color: var(--accent);
-    }
-
-    .field-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-
-        gap: 16px;
-    }
-
-    .field-full {
-        grid-column: 1 / -1;
-    }
-
-    label {
-        display: block;
-
-        margin-bottom: 6px;
-
-        font-family: var(--mono);
-        font-size: 12px;
-
-        color: var(--ink-dim);
-    }
-
-    input,
-    select,
-    textarea {
-
-        width: 100%;
-
-        background: var(--field-bg);
-
-        border: 1px solid var(--panel-border);
-
-        color: var(--ink);
-
-        padding: 10px 12px;
-
-        border-radius: var(--radius);
-
-        font-size: 14px;
-
-        font-family: var(--sans);
-
-        transition: border-color 0.15s ease;
-    }
-
-    textarea {
-        min-height: 90px;
-        resize: vertical;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-        outline: none;
-        border-color: var(--accent);
-    }
-
-    .category-fields {
-        display: none;
-    }
-
-    .category-fields.active {
-        display: block;
-    }
-
-    button {
-        margin-top: 4px;
-
-        background: var(--accent);
-        color: #0b1210;
-
-        border: none;
-
-        padding: 12px;
-
-        border-radius: var(--radius);
-
-        font-size: 14px;
-        font-weight: 600;
-
-        cursor: pointer;
-
-        transition: background 0.15s ease;
-    }
-
-    button:hover {
-        background: #62c1b6;
-    }
-
-    .msg {
-        border-radius: var(--radius);
-
-        padding: 12px 14px;
-
-        font-size: 13px;
-
-        margin-bottom: 4px;
-    }
-
-    .msg--success {
-        background: rgba(79,176,165,0.12);
-        border: 1px solid var(--accent-dim);
-        color: var(--accent);
-    }
-
-    .msg--error {
-        background: rgba(226,102,90,0.1);
-        border: 1px solid var(--danger);
-        color: var(--danger);
-    }
-
-    .msg--error ul {
-        margin: 4px 0 0;
-        padding-left: 18px;
-    }
-
-    .back {
-        display: inline-block;
-
-        margin-top: 16px;
-
-        color: var(--ink-dim);
-        text-decoration: none;
-
-        font-size: 13px;
-    }
-
-    .back:hover {
-        color: var(--accent);
-    }
-
-    @media (max-width: 600px) {
-
-        .field-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .field-full {
-            grid-column: auto;
-        }
-
-        .card__header,
-        form {
-            padding-left: 20px;
-            padding-right: 20px;
-        }
-    }
-
-</style>
-
+<link rel="stylesheet" href="assets/css/app.css">
 </head>
 
 <body>
 
-<div class="card">
+<?php include __DIR__ . '/partials/navbar.php'; ?>
+
+<main>
+<div class="card card--wide">
 
     <div class="card__header">
 
@@ -1541,13 +1281,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Cadastrar produto
         </button>
 
-        <a href="index.php" class="back">
+        <a href="home.php" class="back">
             ← Voltar para o início
         </a>
 
     </form>
 
 </div>
+</main>
 
 
 <script>
