@@ -12,6 +12,7 @@
     --mono: 'JetBrains Mono', 'Courier New', monospace;
     --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
+
 * { box-sizing: border-box; }
 body {
     margin: 0; min-height: 100vh;
@@ -20,6 +21,7 @@ body {
 }
 
 /* Modificador pra telas de auth (login, cadastro) que centralizam um card */
+
 body.auth-page {
     display: flex;
     align-items: center;
@@ -31,13 +33,16 @@ header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 18px 32px; border-bottom: 1px solid var(--panel-border);
 }
+
 header .eyebrow {
     font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--accent); margin: 0;
 }
+
 header a {
     color: var(--ink-dim); text-decoration: none; font-size: 13px;
 }
+
 header a:hover { color: var(--accent); }
 
 header nav .nav-link { color: var(--ink-dim); text-decoration: none; font-size: 13px; }
@@ -47,6 +52,7 @@ header nav .nav-link.ativo { color: var(--accent); font-weight: 600; }
 main {
     max-width: 900px; margin: 0 auto; padding: 40px 32px;
 }
+
 main h1 { font-size: 26px; margin: 0 0 6px; }
 main p.sub { color: var(--ink-dim); margin: 0 0 32px; }
 
@@ -54,32 +60,41 @@ main p.sub { color: var(--ink-dim); margin: 0 0 32px; }
     display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 16px;
 }
+
 .tile {
     background: var(--panel); border: 1px solid var(--panel-border);
     border-radius: var(--radius); padding: 20px; text-decoration: none; color: var(--ink);
     transition: border-color 0.15s ease;
 }
+
 .tile:hover { border-color: var(--accent); }
 .tile .tile-eyebrow {
     font-family: var(--mono); font-size: 11px; color: var(--accent); margin: 0 0 8px;
     text-transform: uppercase; letter-spacing: 0.08em;
 }
+
 .tile h2 { font-size: 16px; margin: 0 0 6px; }
 .tile p { font-size: 13px; color: var(--ink-dim); margin: 0; }
 
 /* ===== Card / Form (usado em cadastro_usuario.php, login.php etc.) ===== */
+
 .card {
-    width: 100%;
-    max-width: 440px;
     background: var(--panel);
     border: 1px solid var(--panel-border);
     border-radius: var(--radius);
     overflow: hidden;
 }
+
+.card--auth {
+    width: 100%;
+    max-width: 440px;
+}
+
 .card__header {
     padding: 22px 28px 18px;
     border-bottom: 1px solid var(--panel-border);
 }
+
 .card__eyebrow {
     font-family: var(--mono);
     font-size: 11px;
@@ -88,18 +103,21 @@ main p.sub { color: var(--ink-dim); margin: 0 0 32px; }
     color: var(--accent);
     margin: 0 0 6px;
 }
+
 .card__title {
     margin: 0;
     font-size: 20px;
     font-weight: 600;
     letter-spacing: -0.01em;
 }
+
 .card form {
     padding: 22px 28px 28px;
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
+
 .card label {
     font-size: 12px;
     color: var(--ink-dim);
@@ -108,6 +126,7 @@ main p.sub { color: var(--ink-dim); margin: 0 0 32px; }
     font-family: var(--mono);
     letter-spacing: 0.02em;
 }
+
 .card input,
 .card select,
 .card textarea {
@@ -121,21 +140,25 @@ main p.sub { color: var(--ink-dim); margin: 0 0 32px; }
     font-family: var(--sans);
     transition: border-color 0.15s ease;
 }
+
 .card textarea {
     min-height: 90px;
     resize: vertical;
 }
+
 .card input:focus,
 .card select:focus,
 .card textarea:focus {
     outline: none;
     border-color: var(--accent);
 }
+
 .field-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
+
 .card button {
     margin-top: 4px;
     background: var(--accent);
@@ -148,6 +171,7 @@ main p.sub { color: var(--ink-dim); margin: 0 0 32px; }
     cursor: pointer;
     transition: background 0.15s ease;
 }
+
 .card button:hover { background: #62c1b6; }
 
 .msg {
@@ -177,6 +201,7 @@ main p.sub { color: var(--ink-dim); margin: 0 0 32px; }
 }
 
 /* Card largo (usado no cadastro de produto, com múltiplas seções) */
+
 .card--wide {
     max-width: 760px;
     margin: 0 auto;
@@ -373,4 +398,163 @@ main.main--narrow {
     padding: 60px 20px;
     color: var(--ink-dim);
     font-size: 14px;
+}
+
+main.wide { max-width: 1080px; }
+
+.card__subtitle { margin: 6px 0 0; font-size: 13px; color: var(--ink-dim); }
+
+/* ---------- Botões-link (<a class="btn">) e variações ---------- */
+
+.btn {
+    background: var(--accent);
+    color: #0b1210;
+    border: none;
+    padding: 11px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+
+.btn:hover { background: #62c1b6; }
+
+.btn--ghost, .card button.btn--ghost {
+    background: transparent;
+    color: var(--ink-dim);
+    border: 1px solid var(--panel-border);
+}
+
+.btn--ghost:hover, .card button.btn--ghost:hover { color: var(--ink); border-color: var(--accent); background: transparent; }
+
+.btn--danger, .card button.btn--danger { background: var(--danger); color: #2b0d0a; }
+.btn--danger:hover, .card button.btn--danger:hover { background: #ea867c; }
+
+.btn--sm, .card button.btn--sm { padding: 6px 10px; font-size: 12px; margin-top: 0; }
+
+.link-secundario {
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-dim);
+    text-decoration: none;
+    margin-top: 2px;
+}
+
+.link-secundario:hover { color: var(--accent); }
+
+/* ---------- Mensagens (fallback pro que o .msg--error/success já cobre) ---------- */
+
+.msg--error ul, .msg--success ul { margin: 4px 0 0; padding-left: 18px; }
+
+/* ---------- Tabelas ---------- */
+
+table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+table.data-table th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--panel-border);
+    white-space: nowrap;
+}
+
+table.data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--panel-border);
+    vertical-align: top;
+}
+
+table.data-table tr:last-child td { border-bottom: none; }
+table.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+.table-wrap { overflow-x: auto; }
+
+.empty-state { padding: 28px 12px; text-align: center; color: var(--ink-dim); font-size: 13px; }
+
+/* ---------- Badges ---------- */
+
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+}
+
+.badge--ok { background: rgba(79,176,165,0.14); color: var(--accent); }
+.badge--warn { background: rgba(217,164,65,0.14); color: var(--warning, #d9a441); }
+.badge--danger { background: rgba(226,102,90,0.14); color: var(--danger); }
+.badge--muted { background: rgba(139,150,168,0.12); color: var(--ink-dim); }
+
+/* ---------- Filtros ---------- */
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+.filter-bar .field { min-width: 160px; flex: 1; }
+.filter-bar .field label { margin-bottom: 4px; }
+.filter-bar .actions { display: flex; gap: 8px; }
+
+/* ---------- Dashboard ---------- */
+
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+.stat-card {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+}
+
+.stat-card .stat-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+    margin: 0 0 10px;
+}
+
+.stat-card .stat-value { font-size: 26px; font-weight: 700; margin: 0; }
+.stat-card .stat-value.stat-danger { color: var(--danger); }
+.stat-card .stat-value.stat-warn { color: var(--warning, #d9a441); }
+.stat-card .stat-hint { font-size: 12px; color: var(--ink-dim); margin: 6px 0 0; }
+
+.chart-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+.chart-card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: var(--radius); padding: 18px 20px; }
+.chart-card h3 { margin: 0 0 14px; font-size: 14px; }
+.chart-card canvas { max-height: 260px; }
+
+/* ---------- Tabs ---------- */
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--panel-border); padding: 0 24px; }
+
+.tabs a {
+    padding: 12px 6px;
+    color: var(--ink-dim);
+    text-decoration: none;
+    font-size: 13px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.tabs a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+@media (max-width: 700px) {
+    .chart-grid { grid-template-columns: 1fr; }
 }

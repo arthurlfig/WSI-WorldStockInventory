@@ -1,8 +1,4 @@
-<?php
-require_once __DIR__ . '/auth.php';
-exigirLogin();
-
-require_once __DIR__ . '/config/database.php';
+<?php require_once __DIR__ . '/auth.php'; exigirLogin(); require_once __DIR__ . '/config/database.php';
 
 $pdo = Database::getConnection();
 
@@ -129,7 +125,7 @@ $rotulosCategoria = [
 
 <main>
     <h1>Produtos</h1>
-    <p class="sub">Todos os itens cadastrados no estoque.</p>
+    <p class="sub">Todos os itens cadastrados no estoque. Para ver fornecedor, lotes e validade de um item, abra "Fornecedor, lotes e validade" no card dele — ou veja a <a href="consulta_produtos.php" style="color: var(--accent);">lista por fornecedor</a>. Para cadastrar um novo produto, use <a href="cadastro_produto.php" style="color: var(--accent);">Cadastrar produto</a>.</p>
 
     <div class="filters">
         <?php foreach ($categorias as $valor => $rotulo): ?>
@@ -164,6 +160,9 @@ $rotulosCategoria = [
                     <?php endif; ?>
 
                     <?php $meta = metaDoProduto($p); ?>
+                    <?php if ($p['fornecedor_nome']): ?>
+                        <p class="product-card__desc" style="margin-top:2px;">Fornecedor: <?= htmlspecialchars($p['fornecedor_nome']) ?></p>
+                    <?php endif; ?>
                     <?php if (!empty($meta)): ?>
                         <div class="product-card__meta">
                             <?php foreach ($meta as $linha): ?>
@@ -180,6 +179,7 @@ $rotulosCategoria = [
                             Estoque mín.: <?= (int)$p['estoque_minimo'] ?>
                         </span>
                     </div>
+                    <a class="btn btn--ghost btn--sm" style="margin-top:10px;" href="consulta_produtos.php?id=<?= (int)$p['id'] ?>">Fornecedor, lotes e validade</a>
                 </div>
 
             <?php endforeach; ?>

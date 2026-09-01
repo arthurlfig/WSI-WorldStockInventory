@@ -1,8 +1,4 @@
-<?php
-require_once __DIR__ . '/auth.php';
-exigirLogin();
-
-require_once __DIR__ . '/config/database.php';
+<?php require_once __DIR__ . '/auth.php'; exigirLogin(); require_once __DIR__ . '/config/database.php';
 
 $erros = [];
 $sucesso = '';

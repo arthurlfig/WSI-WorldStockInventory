@@ -1,5 +1,4 @@
-<?php
-require_once __DIR__ . '/config/database.php';
+<?php require_once __DIR__ . '/config/database.php';
 
 $erros = [];
 $valores = ['nome' => '', 'email' => ''];
@@ -38,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $erros[] = 'Já existe um usuário cadastrado com esse e-mail.';
         } else {
             $stmt = $pdo->prepare(
-                'INSERT INTO usuarios (nome, email, senha_hash)
-                 VALUES (:nome, :email, :senha_hash)'
+                'INSERT INTO usuarios (nome, email, senha_hash, nivel_acesso)
+                 VALUES (:nome, :email, :senha_hash, \'operador\')'
             );
             $stmt->execute([
                 'nome'       => $valores['nome'],
@@ -63,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="auth-page">
 
-<div class="card">
+<div class="card card--auth">
     <div class="card__header">
         <p class="card__eyebrow">Usuários · Novo registro</p>
         <h1 class="card__title">Cadastro de usuário</h1>
@@ -103,8 +102,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         <p class="hint">Mínimo de 6 caracteres.</p>
+        <p class="hint">A conta é criada como <strong>Operador</strong>. Um administrador pode promovê-la em Consulta de Contas.</p>
 
         <button type="submit">Cadastrar usuário</button>
+
+        <a href="login.php" class="link-secundario">Já tem conta? Entrar</a>
     </form>
 </div>
 
