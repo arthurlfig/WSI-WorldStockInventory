@@ -11,13 +11,14 @@ CREATE DATABASE IF NOT EXISTS wsi
 USE wsi;
 
 -- ============================================================
--- USUÁRIOS DO SISTEMA (todos são gestores/admin, não há outros perfis)
+-- USUÁRIOS DO SISTEMA
 -- ============================================================
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(120) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     senha_hash VARCHAR(255) NOT NULL,
+    nivel_acesso ENUM('admin', 'operador') NOT NULL DEFAULT 'operador',
     ativo TINYINT(1) NOT NULL DEFAULT 1,
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
@@ -266,6 +267,15 @@ ORDER BY l.data_validade ASC;
 -- USUÁRIO INICIAL (senha: admin123 -> troque em produção)
 -- Hash gerado com password_hash('admin123', PASSWORD_DEFAULT)
 -- ============================================================
-INSERT INTO usuarios (nome, email, senha_hash)
+INSERT INTO usuarios (nome, email, senha_hash, nivel_acesso)
 VALUES ('Administrador', 'admin@sistema.com',
-        '$2y$10$3Q6nq0e6c1Yv8m0Z0mR0Y.examplehashchangeit1234567890abcd');
+        '$2y$10$lHG4C/oOzOY4TMSPQrTQZekUvAL6uTM5kDlK3/ZcGRAyezup3xeX.',
+        'admin');
+
+-- ============================================================
+-- MIGRAÇÃO — rode isto se o banco `wsi` já existe antes desta versão do schema na sua máquina
+-- ============================================================
+-- ALTER TABLE usuarios
+--     ADD COLUMN nivel_acesso ENUM('admin', 'operador') NOT NULL DEFAULT 'operador'
+--     AFTER senha_hash;
+-- UPDATE usuarios SET nivel_acesso = 'admin' WHERE id = 1;
