@@ -148,7 +148,7 @@ $rotulosCategoria = [
         <div class="product-grid">
             <?php foreach ($produtos as $p): ?>
 
-                <div class="product-card">
+                <div class="product-card" style="cursor: pointer;" onclick="window.location='produto_individual.php?id=<?= (int)$p['id'] ?>'">
                     <p class="product-card__badge">
                         <?= htmlspecialchars($rotulosCategoria[$p['categoria']] ?? $p['categoria']) ?>
                     </p>
@@ -179,7 +179,7 @@ $rotulosCategoria = [
                             Estoque mín.: <?= (int)$p['estoque_minimo'] ?>
                         </span>
                     </div>
-                    <a class="btn btn--ghost btn--sm" style="margin-top:10px;" href="consulta_produtos.php?id=<?= (int)$p['id'] ?>">Fornecedor, lotes e validade</a>
+                    <a class="btn btn--ghost btn--sm" style="margin-top:10px;" href="consulta_produtos.php?id=<?= (int)$p['id'] ?>" onclick="event.stopPropagation();">Fornecedor, lotes e validade</a>
                 </div>
 
             <?php endforeach; ?>

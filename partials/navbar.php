@@ -13,6 +13,8 @@ function navLinkClass($arquivo, $paginaAtual) {
         <nav style="display:flex; gap:14px; flex-wrap: wrap; row-gap: 6px;">
             <a class="<?= navLinkClass('home.php', $paginaAtual) ?>" href="home.php">Início</a>
             <a class="<?= navLinkClass('dashboard.php', $paginaAtual) ?>" href="dashboard.php">Dashboard</a>
+            <a class="<?= navLinkClass('configuracoes.php', $paginaAtual) ?>" href="configuracoes.php">Configurações</a>
+            <a class="<?= navLinkClass('notificacoes.php', $paginaAtual) ?>" href="notificacoes.php">Notificações</a>
             <a class="<?= navLinkClass('produtos.php', $paginaAtual) ?>" href="produtos.php">Produtos</a>
             <a class="<?= navLinkClass('cadastro_entrada.php', $paginaAtual) ?>" href="cadastro_entrada.php">Entradas</a>
             <a class="<?= navLinkClass('cadastro_saida.php', $paginaAtual) ?>" href="cadastro_saida.php">Saídas</a>
