@@ -1,8 +1,10 @@
 <?php require_once __DIR__ . '/auth.php'; exigirAdmin();
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/repositories/UsuarioRepository.php';
 
 $pdo = Database::getConnection();
+$usuarioRepository = new UsuarioRepository($pdo);
 
 $aviso = '';
 $erro = '';
@@ -38,40 +40,16 @@ $busca = trim($_GET['busca'] ?? '');
 $filtroStatus = $_GET['status'] ?? 'todos';
 $filtroNivel = $_GET['nivel'] ?? 'todos';
 
-$condicoes = [];
-$parametros = [];
+//mudei por conta do padrao de projeto
+$usuarios = $usuarioRepository->listar(
+    $busca,
+    $filtroStatus,
+    $filtroNivel
+);
+$totalContas = $usuarioRepository->contarTotal();
+$totalAtivas = $usuarioRepository->contarAtivas();
+$totalAdmins = $usuarioRepository->contarAdmins();
 
-if ($busca !== '') {
-    $condicoes[] = '(nome LIKE :busca OR email LIKE :busca)';
-    $parametros['busca'] = '%' . $busca . '%';
-}
-
-if ($filtroStatus === 'ativos') {
-    $condicoes[] = 'ativo = 1';
-} elseif ($filtroStatus === 'inativos') {
-    $condicoes[] = 'ativo = 0';
-}
-
-if (in_array($filtroNivel, ['admin', 'operador'], true)) {
-    $condicoes[] = 'nivel_acesso = :nivel_filtro';
-    $parametros['nivel_filtro'] = $filtroNivel;
-}
-
-$sql = 'SELECT id, nome, email, nivel_acesso, ativo, criado_em FROM usuarios';
-
-if (!empty($condicoes)) {
-    $sql .= ' WHERE ' . implode(' AND ', $condicoes);
-}
-
-$sql .= ' ORDER BY nome';
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($parametros);
-$usuarios = $stmt->fetchAll();
-
-$totalContas = $pdo->query('SELECT COUNT(*) FROM usuarios')->fetchColumn();
-$totalAtivas = $pdo->query('SELECT COUNT(*) FROM usuarios WHERE ativo = 1')->fetchColumn();
-$totalAdmins = $pdo->query("SELECT COUNT(*) FROM usuarios WHERE nivel_acesso = 'admin'")->fetchColumn();
 
 ?>
 <!DOCTYPE html>

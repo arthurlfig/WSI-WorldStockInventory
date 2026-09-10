@@ -1,6 +1,10 @@
-<?php require_once __DIR__ . '/auth.php'; exigirLogin(); require_once __DIR__ . '/config/database.php';
+<?php require_once __DIR__ . '/auth.php'; exigirLogin(); 
+require_once __DIR__ . '/config/database.php';
 
 $pdo = Database::getConnection();
+require_once __DIR__ . '/repositories/ProdutoRepository.php';
+
+$produtoRepository = new ProdutoRepository($pdo);
 
 $categorias = [
     ''           => 'Todos',
@@ -16,54 +20,7 @@ $categoriaAtiva = $_GET['categoria'] ?? '';
 if (!array_key_exists($categoriaAtiva, $categorias)) {
     $categoriaAtiva = '';
 }
-
-$sql = '
-    SELECT
-        p.id, p.nome, p.descricao, p.categoria, p.codigo_barras,
-        p.preco_venda, p.estoque_minimo,
-        f.nome AS fornecedor_nome,
-
-        r.tamanho, r.marca AS roupa_marca, r.sexo,
-
-        c.categoria_cosmetico, c.tom_cor,
-        c.quantidade_valor, c.quantidade_unidade,
-
-        b.classificacao_indicativa AS classificacao_brinquedo,
-        b.marca AS brinquedo_marca, b.colecao,
-
-        j.genero AS genero_jogo,
-        j.classificacao_indicativa AS classificacao_jogo,
-        j.desenvolvedora, j.plataforma, j.modo_jogo,
-
-        fi.genero AS genero_filme,
-        fi.classificacao_indicativa AS classificacao_filme,
-        fi.duracao_minutos, fi.data_lancamento
-
-    FROM produtos p
-    LEFT JOIN fornecedores f ON f.id = p.fornecedor_id
-    LEFT JOIN roupas r      ON r.produto_id = p.id
-    LEFT JOIN cosmeticos c  ON c.produto_id = p.id
-    LEFT JOIN brinquedos b  ON b.produto_id = p.id
-    LEFT JOIN jogos j       ON j.produto_id = p.id
-    LEFT JOIN filmes fi     ON fi.produto_id = p.id
-';
-
-$params = [];
-
-if ($categoriaAtiva !== '') {
-    $sql .= ' WHERE p.categoria = :categoria';
-    $params['categoria'] = $categoriaAtiva;
-}
-
-$sql .= ' ORDER BY p.nome';
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-/**
- * Monta as linhas de meta-informação específicas de cada categoria.
- */
+$produtos = $produtoRepository->listarPorCategoria($categoriaAtiva);
 function metaDoProduto(array $p): array
 {
     $meta = [];
