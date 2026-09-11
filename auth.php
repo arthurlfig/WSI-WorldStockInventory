@@ -3,15 +3,40 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/** Singleton responsável pela verificação de login.*/
+class Auth
+{
+    private static ?self $instance = null;
+    private function __construct()
+    {
+    }
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * Se não estiver logado, manda pro login.
+     */
+    public function exigirLogin(): void
+    {
+        if (empty($_SESSION['usuario_id'])) {
+            header('Location: login.php');
+            exit;
+        }
+    }
+}
+
 /**
  * Se não estiver logado, manda pro login.
  */
 function exigirLogin(): void
 {
-    if (empty($_SESSION['usuario_id'])) {
-        header('Location: login.php');
-        exit;
-    }
+    Auth::getInstance()->exigirLogin();
 }
 
 function exigirAdmin(): void
