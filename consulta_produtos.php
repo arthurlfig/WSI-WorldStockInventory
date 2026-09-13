@@ -52,8 +52,29 @@ if ($idDetalhe === null) {
     $parametros = [];
 
     if ($busca !== '') {
-        $condicoes[] = '(p.nome LIKE :busca OR f.nome LIKE :busca OR f.pais_origem LIKE :busca)';
-        $parametros['busca'] = '%' . $busca . '%';
+        $condicoes[] = "(
+            p.nome LIKE :busca1
+            OR f.nome LIKE :busca2
+            OR f.pais_origem LIKE :busca3
+            OR p.codigo_barras LIKE :busca4
+            OR EXISTS (
+                SELECT 1 FROM lotes l
+                WHERE l.produto_id = p.id AND l.numero_lote LIKE :busca5
+            )
+            OR EXISTS (
+                SELECT 1 FROM roupas r
+                WHERE r.produto_id = p.id AND r.marca LIKE :busca6
+            )
+            OR EXISTS (
+                SELECT 1 FROM brinquedos b
+                WHERE b.produto_id = p.id AND b.marca LIKE :busca7
+            )
+        )";
+
+        $valorBusca = '%' . $busca . '%';
+        for ($i = 1; $i <= 7; $i++) {
+            $parametros['busca' . $i] = $valorBusca;
+        }
     }
 
     if (in_array($filtroCategoria, array_keys($mapaCategorias), true)) {
@@ -210,7 +231,7 @@ if ($idDetalhe === null) {
         <form method="GET" action="" class="filter-bar">
             <div class="field">
                 <label for="busca">Buscar</label>
-                <input type="text" id="busca" name="busca" value="<?= htmlspecialchars($busca) ?>" placeholder="Produto, fornecedor ou país...">
+                <input type="text" id="busca" name="busca" value="<?= htmlspecialchars($busca) ?>" placeholder="Produto, fornecedor, país, marca, código de barras ou lote...">
             </div>
             <div class="field">
                 <label for="categoria">Categoria</label>
