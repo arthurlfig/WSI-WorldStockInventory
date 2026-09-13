@@ -24,6 +24,22 @@ CREATE TABLE usuarios (
 ) ENGINE=InnoDB;
 
 -- ============================================================
+-- REDEFINIÇÃO DE SENHA (recuperar senha)
+-- ============================================================
+CREATE TABLE password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expira_em DATETIME NOT NULL,
+    usado TINYINT(1) NOT NULL DEFAULT 0,
+    CONSTRAINT fk_password_resets_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        ON DELETE CASCADE,
+    INDEX idx_password_resets_token (token)
+) ENGINE=InnoDB;
+
+-- ============================================================
 -- FORNECEDORES (essencial para importação)
 -- ============================================================
 CREATE TABLE fornecedores (
@@ -264,18 +280,9 @@ WHERE l.data_validade IS NOT NULL
 ORDER BY l.data_validade ASC;
 
 -- ============================================================
--- USUÁRIO INICIAL (senha: admin123 -> troque em produção)
+-- USUÁRIO ADMINISTRADOR (e-mail: admin@sistema.com, senha: admin123)
 -- Hash gerado com password_hash('admin123', PASSWORD_DEFAULT)
 -- ============================================================
-INSERT INTO usuarios (nome, email, senha_hash, nivel_acesso)
-VALUES ('Administrador', 'admin@sistema.com',
-        '$2y$10$lHG4C/oOzOY4TMSPQrTQZekUvAL6uTM5kDlK3/ZcGRAyezup3xeX.',
-        'admin');
 
--- ============================================================
--- MIGRAÇÃO — rode isto se o banco `wsi` já existe antes desta versão do schema na sua máquina
--- ============================================================
--- ALTER TABLE usuarios
---     ADD COLUMN nivel_acesso ENUM('admin', 'operador') NOT NULL DEFAULT 'operador'
---     AFTER senha_hash;
--- UPDATE usuarios SET nivel_acesso = 'admin' WHERE id = 1;
+INSERT INTO usuarios (nome, email, senha_hash, nivel_acesso)
+VALUES ('Administrador', 'admin@sistema.com', '$2y$10$lHG4C/oOzOY4TMSPQrTQZekUvAL6uTM5kDlK3/ZcGRAyezup3xeX.', 'admin');
