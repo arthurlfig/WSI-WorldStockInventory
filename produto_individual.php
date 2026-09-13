@@ -3,14 +3,28 @@ require_once __DIR__ . '/auth.php';
 exigirLogin();
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/repositories/ProdutoRepository.php';
 
 $pdo = Database::getConnection();
+$produtoRepository = new ProdutoRepository($pdo);
 
-$id = $_GET['id'] ?? '';
+$id = $_POST['id'] ?? $_GET['id'] ?? '';
 
 if ($id === '' || !ctype_digit((string) $id)) {
     header('Location: consulta_produtos.php');
     exit;
+}
+
+$id = (int) $id;
+
+$avisoStatus = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'inativar') {
+    $produtoRepository->inativar($id);
+    $avisoStatus = 'Produto excluído (inativado). Ele não aparece mais nas listagens e não pode receber novas movimentações.';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'reativar') {
+    $produtoRepository->reativar($id);
+    $avisoStatus = 'Produto reativado.';
 }
 
 $categoriasLabels = [
@@ -162,6 +176,77 @@ try {
         font-size: 13px;
     }
 
+    .msg--sucesso {
+        background: rgba(79,176,165,0.1);
+        border: 1px solid var(--accent-dim);
+        color: var(--accent);
+        border-radius: var(--radius);
+        padding: 12px 14px;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .badge-inativo {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--danger);
+        background: rgba(226,102,90,0.1);
+        border: 1px solid var(--danger);
+        border-radius: 4px;
+        padding: 3px 8px;
+        margin-left: 8px;
+        margin-bottom: 10px;
+    }
+
+    .produto-acoes {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .botoes-produto {
+        display: flex;
+        gap: 8px;
+    }
+
+    .botoes-produto form { margin: 0; }
+
+    .btn-editar,
+    .btn-excluir,
+    .btn-reativar {
+        font-family: var(--sans);
+        font-size: 12px;
+        border-radius: 4px;
+        padding: 6px 12px;
+        cursor: pointer;
+        text-decoration: none;
+        border: 1px solid var(--panel-border);
+        background: var(--panel);
+        color: var(--ink);
+    }
+
+    .btn-editar:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-excluir {
+        border-color: var(--danger);
+        color: var(--danger);
+        background: transparent;
+    }
+
+    .btn-excluir:hover { background: rgba(226,102,90,0.1); }
+
+    .btn-reativar {
+        border-color: var(--accent-dim);
+        color: var(--accent);
+        background: transparent;
+    }
+
+    .btn-reativar:hover { background: rgba(79,176,165,0.1); }
+
     .vazio {
         text-align: center;
         padding: 60px 20px;
@@ -301,16 +386,41 @@ try {
 
     <?php else: ?>
 
+        <?php if ($avisoStatus): ?>
+            <div class="msg--sucesso"><?= htmlspecialchars($avisoStatus) ?></div>
+        <?php endif; ?>
+
         <div class="produto-header">
             <div>
                 <span class="badge">
                     <?= htmlspecialchars($categoriasLabels[$produto['categoria']] ?? $produto['categoria']) ?>
                 </span>
+                <?php if (!$produto['ativo']): ?>
+                    <span class="badge badge-inativo">Inativo</span>
+                <?php endif; ?>
                 <h1><?= htmlspecialchars($produto['nome']) ?></h1>
             </div>
-            <div class="preco-destaque">
-                <span>Preço de venda</span>
-                R$ <?= number_format((float) $produto['preco_venda'], 2, ',', '.') ?>
+            <div class="produto-acoes">
+                <div class="preco-destaque">
+                    <span>Preço de venda</span>
+                    R$ <?= number_format((float) $produto['preco_venda'], 2, ',', '.') ?>
+                </div>
+                <div class="botoes-produto">
+                    <a href="editar_produto.php?id=<?= (int) $produto['id'] ?>" class="btn-editar">Editar</a>
+                    <?php if ($produto['ativo']): ?>
+                        <form method="POST" action="" onsubmit="return confirm('Tem certeza que deseja excluir este produto? Ele será inativado e poderá ser reativado depois.');">
+                            <input type="hidden" name="id" value="<?= (int) $produto['id'] ?>">
+                            <input type="hidden" name="acao" value="inativar">
+                            <button type="submit" class="btn-excluir">Excluir</button>
+                        </form>
+                    <?php else: ?>
+                        <form method="POST" action="">
+                            <input type="hidden" name="id" value="<?= (int) $produto['id'] ?>">
+                            <input type="hidden" name="acao" value="reativar">
+                            <button type="submit" class="btn-reativar">Reativar</button>
+                        </form>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 
