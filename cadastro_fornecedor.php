@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/auth.php'; exigirAdmin(); require_once __DIR__ . '/config/database.php';
+<?php require_once __DIR__ . '/auth.php'; exigirLogin(); require_once __DIR__ . '/config/database.php';
 
 $pdo = Database::getConnection();
 
@@ -18,6 +18,10 @@ $valores = [
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = $_POST['acao'] ?? '';
+
+    if (in_array($acao, ['alternar_status', 'salvar'], true)) {
+        exigirAdmin();
+    }
 
     if ($acao === 'alternar_status') {
         $id = (int)($_POST['id'] ?? 0);
@@ -44,6 +48,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($valores['email'] !== '' && !filter_var($valores['email'], FILTER_VALIDATE_EMAIL)) {
             $erros[] = 'Informe um e-mail válido (ou deixe em branco).';
+        }
+
+        /* Verifica se já existe outro fornecedor com o mesmo nome ou o mesmo CNPJ/CPF (quando informado). */
+
+        if (empty($erros)) {
+            $condicoesDuplicidade = ['LOWER(nome) = LOWER(:nome)'];
+            $parametrosDuplicidade = ['nome' => $valores['nome']];
+
+            if ($valores['cnpj_cpf'] !== '') {
+                $condicoesDuplicidade[] = 'cnpj_cpf = :cnpj_cpf';
+                $parametrosDuplicidade['cnpj_cpf'] = $valores['cnpj_cpf'];
+            }
+
+            $sqlDuplicidade = 'SELECT id FROM fornecedores WHERE (' . implode(' OR ', $condicoesDuplicidade) . ')';
+
+            if ($valores['id'] !== '') {
+                $sqlDuplicidade .= ' AND id != :id_atual';
+                $parametrosDuplicidade['id_atual'] = $valores['id'];
+            }
+
+            $stmt = $pdo->prepare($sqlDuplicidade);
+            $stmt->execute($parametrosDuplicidade);
+
+            if ($stmt->fetch()) {
+                $erros[] = 'Já existe um fornecedor cadastrado com esse nome ou CNPJ/CPF.';
+            }
         }
 
         if (empty($erros)) {
@@ -128,8 +158,11 @@ $condicoes = [];
 $parametros = [];
 
 if ($busca !== '') {
-    $condicoes[] = '(nome LIKE :busca OR pais_origem LIKE :busca OR contato_responsavel LIKE :busca)';
-    $parametros['busca'] = '%' . $busca . '%';
+    $condicoes[] = '(nome LIKE :busca1 OR pais_origem LIKE :busca2 OR contato_responsavel LIKE :busca3)';
+    $valorBusca = '%' . $busca . '%';
+    $parametros['busca1'] = $valorBusca;
+    $parametros['busca2'] = $valorBusca;
+    $parametros['busca3'] = $valorBusca;
 }
 
 if ($filtroStatus === 'ativos') {
@@ -166,12 +199,13 @@ $fornecedores = $stmt->fetchAll();
 
 <main class="wide">
     <h1>Fornecedores</h1>
-    <p class="sub">Cadastre e gerencie os fornecedores usados nas importações.</p>
+    <p class="sub"><?= usuarioEhAdmin() ? 'Cadastre e gerencie os fornecedores usados nas importações.' : 'Consulte os fornecedores cadastrados no sistema.' ?></p>
 
     <?php if ($sucesso): ?>
         <div class="msg msg--success" style="margin-bottom: 20px;"><?= htmlspecialchars($sucesso) ?></div>
     <?php endif; ?>
 
+    <?php if (usuarioEhAdmin()): ?>
     <div class="card" style="margin-bottom: 24px;">
         <div class="card__header">
             <p class="card__eyebrow">
@@ -240,6 +274,7 @@ $fornecedores = $stmt->fetchAll();
             </div>
         </form>
     </div>
+    <?php endif; ?>
 
     <div class="card">
         <div class="card__header">
@@ -278,7 +313,9 @@ $fornecedores = $stmt->fetchAll();
                             <th>Contato</th>
                             <th>Telefone / E-mail</th>
                             <th>Status</th>
-                            <th>Ações</th>
+                            <?php if (usuarioEhAdmin()): ?>
+                                <th>Ações</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -298,6 +335,7 @@ $fornecedores = $stmt->fetchAll();
                                         <span class="badge badge--muted">Inativo</span>
                                     <?php endif; ?>
                                 </td>
+                                <?php if (usuarioEhAdmin()): ?>
                                 <td>
                                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                         <a class="btn btn--ghost btn--sm" href="cadastro_fornecedor.php?editar=<?= (int)$f['id'] ?>">Editar</a>
@@ -310,6 +348,7 @@ $fornecedores = $stmt->fetchAll();
                                         </form>
                                     </div>
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

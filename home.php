@@ -71,17 +71,17 @@
             <p>Adicionar um novo operador ao sistema.</p>
         </a>
 
+        <a class="tile" href="cadastro_fornecedor.php">
+            <p class="tile-eyebrow"><?= usuarioEhAdmin() ? 'Administração' : 'Produtos' ?></p>
+            <h2><?= usuarioEhAdmin() ? 'Cadastrar fornecedor' : 'Consultar fornecedores' ?></h2>
+            <p><?= usuarioEhAdmin() ? 'Gerenciar quem fornece cada importação.' : 'Ver fornecedores cadastrados e seus dados de contato.' ?></p>
+        </a>
+
         <?php if (usuarioEhAdmin()): ?>
             <a class="tile" href="consulta_contas.php">
                 <p class="tile-eyebrow">Administração</p>
                 <h2>Consulta de contas</h2>
                 <p>Buscar, filtrar, promover e ativar/inativar contas.</p>
-            </a>
-
-            <a class="tile" href="cadastro_fornecedor.php">
-                <p class="tile-eyebrow">Administração</p>
-                <h2>Cadastrar fornecedor</h2>
-                <p>Gerenciar quem fornece cada importação.</p>
             </a>
         <?php endif; ?>
     </div>

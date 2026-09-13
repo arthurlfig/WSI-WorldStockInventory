@@ -20,8 +20,8 @@ function navLinkClass($arquivo, $paginaAtual) {
             <a class="<?= navLinkClass('cadastro_saida.php', $paginaAtual) ?>" href="cadastro_saida.php">Saídas</a>
             <a class="<?= navLinkClass('cadastro_venda.php', $paginaAtual) ?>" href="cadastro_venda.php">Vendas</a>
             <a class="<?= navLinkClass('historico.php', $paginaAtual) ?>" href="historico.php">Histórico</a>
+            <a class="<?= navLinkClass('cadastro_fornecedor.php', $paginaAtual) ?>" href="cadastro_fornecedor.php">Fornecedores</a>
             <?php if ($souAdmin): ?>
-                <a class="<?= navLinkClass('cadastro_fornecedor.php', $paginaAtual) ?>" href="cadastro_fornecedor.php">Fornecedores</a>
                 <a class="<?= navLinkClass('consulta_contas.php', $paginaAtual) ?>" href="consulta_contas.php">Contas</a>
             <?php endif; ?>
         </nav>
