@@ -1,6 +1,8 @@
 <?php require_once __DIR__ . '/auth.php'; exigirLogin(); require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/repositories/FornecedorRepository.php';
 
 $pdo = Database::getConnection();
+$fornecedorRepository = new FornecedorRepository($pdo);
 
 $erros = [];
 $sucesso = '';
@@ -27,8 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['id'] ?? 0);
 
         if ($id > 0) {
-            $stmt = $pdo->prepare('UPDATE fornecedores SET ativo = NOT ativo WHERE id = :id');
-            $stmt->execute(['id' => $id]);
+            $fornecedorRepository->alternarStatus($id);
         }
 
         header('Location: cadastro_fornecedor.php');
@@ -53,25 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /* Verifica se já existe outro fornecedor com o mesmo nome ou o mesmo CNPJ/CPF (quando informado). */
 
         if (empty($erros)) {
-            $condicoesDuplicidade = ['LOWER(nome) = LOWER(:nome)'];
-            $parametrosDuplicidade = ['nome' => $valores['nome']];
+            $idAtual = $valores['id'] !== '' ? (int) $valores['id'] : null;
 
-            if ($valores['cnpj_cpf'] !== '') {
-                $condicoesDuplicidade[] = 'cnpj_cpf = :cnpj_cpf';
-                $parametrosDuplicidade['cnpj_cpf'] = $valores['cnpj_cpf'];
-            }
-
-            $sqlDuplicidade = 'SELECT id FROM fornecedores WHERE (' . implode(' OR ', $condicoesDuplicidade) . ')';
-
-            if ($valores['id'] !== '') {
-                $sqlDuplicidade .= ' AND id != :id_atual';
-                $parametrosDuplicidade['id_atual'] = $valores['id'];
-            }
-
-            $stmt = $pdo->prepare($sqlDuplicidade);
-            $stmt->execute($parametrosDuplicidade);
-
-            if ($stmt->fetch()) {
+            if ($fornecedorRepository->existeDuplicado($valores['nome'], $valores['cnpj_cpf'], $idAtual)) {
                 $erros[] = 'Já existe um fornecedor cadastrado com esse nome ou CNPJ/CPF.';
             }
         }
@@ -79,50 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($erros)) {
             try {
                 if ($valores['id'] !== '') {
-                    // Atualização
-                    $stmt = $pdo->prepare(
-                        'UPDATE fornecedores SET
-                            nome = :nome,
-                            cnpj_cpf = :cnpj_cpf,
-                            pais_origem = :pais_origem,
-                            telefone = :telefone,
-                            email = :email,
-                            endereco = :endereco,
-                            contato_responsavel = :contato_responsavel
-                         WHERE id = :id'
-                    );
-
-                    $stmt->execute([
-                        'nome' => $valores['nome'],
-                        'cnpj_cpf' => $valores['cnpj_cpf'] !== '' ? $valores['cnpj_cpf'] : null,
-                        'pais_origem' => $valores['pais_origem'] !== '' ? $valores['pais_origem'] : null,
-                        'telefone' => $valores['telefone'] !== '' ? $valores['telefone'] : null,
-                        'email' => $valores['email'] !== '' ? $valores['email'] : null,
-                        'endereco' => $valores['endereco'] !== '' ? $valores['endereco'] : null,
-                        'contato_responsavel' => $valores['contato_responsavel'] !== '' ? $valores['contato_responsavel'] : null,
-                        'id' => $valores['id'],
-                    ]);
-
+                    $fornecedorRepository->atualizar((int) $valores['id'], $valores);
                     $sucesso = 'Fornecedor atualizado com sucesso!';
                 } else {
-                    // Inserção
-                    $stmt = $pdo->prepare(
-                        'INSERT INTO fornecedores
-                            (nome, cnpj_cpf, pais_origem, telefone, email, endereco, contato_responsavel)
-                         VALUES
-                            (:nome, :cnpj_cpf, :pais_origem, :telefone, :email, :endereco, :contato_responsavel)'
-                    );
-
-                    $stmt->execute([
-                        'nome' => $valores['nome'],
-                        'cnpj_cpf' => $valores['cnpj_cpf'] !== '' ? $valores['cnpj_cpf'] : null,
-                        'pais_origem' => $valores['pais_origem'] !== '' ? $valores['pais_origem'] : null,
-                        'telefone' => $valores['telefone'] !== '' ? $valores['telefone'] : null,
-                        'email' => $valores['email'] !== '' ? $valores['email'] : null,
-                        'endereco' => $valores['endereco'] !== '' ? $valores['endereco'] : null,
-                        'contato_responsavel' => $valores['contato_responsavel'] !== '' ? $valores['contato_responsavel'] : null,
-                    ]);
-
+                    $fornecedorRepository->inserir($valores);
                     $sucesso = 'Fornecedor cadastrado com sucesso!';
                 }
 
@@ -137,9 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['editar'])) {
-    $stmt = $pdo->prepare('SELECT * FROM fornecedores WHERE id = :id');
-    $stmt->execute(['id' => (int)$_GET['editar']]);
-    $fornecedorEditando = $stmt->fetch();
+    $fornecedorEditando = $fornecedorRepository->buscarPorId((int) $_GET['editar']);
 
     if ($fornecedorEditando) {
         foreach ($valores as $campo => $valor) {
@@ -154,35 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['editar'])) {
 $busca = trim($_GET['busca'] ?? '');
 $filtroStatus = $_GET['status'] ?? 'todos';
 
-$condicoes = [];
-$parametros = [];
-
-if ($busca !== '') {
-    $condicoes[] = '(nome LIKE :busca1 OR pais_origem LIKE :busca2 OR contato_responsavel LIKE :busca3)';
-    $valorBusca = '%' . $busca . '%';
-    $parametros['busca1'] = $valorBusca;
-    $parametros['busca2'] = $valorBusca;
-    $parametros['busca3'] = $valorBusca;
-}
-
-if ($filtroStatus === 'ativos') {
-    $condicoes[] = 'ativo = 1';
-} elseif ($filtroStatus === 'inativos') {
-    $condicoes[] = 'ativo = 0';
-}
-
-$sql = 'SELECT id, nome, cnpj_cpf, pais_origem, telefone, email, contato_responsavel, ativo, criado_em
-        FROM fornecedores';
-
-if (!empty($condicoes)) {
-    $sql .= ' WHERE ' . implode(' AND ', $condicoes);
-}
-
-$sql .= ' ORDER BY nome';
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($parametros);
-$fornecedores = $stmt->fetchAll();
+$fornecedores = $fornecedorRepository->listar($busca, $filtroStatus);
 
 ?>
 <!DOCTYPE html>
