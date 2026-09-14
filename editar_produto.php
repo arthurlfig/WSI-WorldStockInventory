@@ -1,5 +1,8 @@
 <?php require_once __DIR__ . '/auth.php'; exigirLogin(); require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/repositories/ProdutoRepository.php';
+require_once __DIR__ . '/template_method/RoupaHandler.php';
+require_once __DIR__ . '/template_method/CosmeticoHandler.php';
+require_once __DIR__ . '/template_method/BrinquedoHandler.php';
 
 $pdo = Database::getConnection();
 $produtoRepository = new ProdutoRepository($pdo);
@@ -143,67 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      * ==========================
      */
 
-    if ($valores['categoria'] === 'roupa') {
-
-        if ($valores['tamanho'] === '') {
-            $erros[] = 'Informe o tamanho da roupa.';
-        }
-
-        $sexosValidos = ['masculino', 'feminino', 'unissex'];
-
-        if (!in_array($valores['sexo'], $sexosValidos, true)) {
-            $erros[] = 'Selecione um sexo válido para a roupa.';
-        }
-    }
-
-    if ($valores['categoria'] === 'cosmetico') {
-
-        $categoriasCosmeticoValidas = [
-            'perfume',
-            'maquiagem',
-            'skincare',
-            'capilar',
-            'cuidados_pessoais'
-        ];
-
-        if (
-            !in_array(
-                $valores['categoria_cosmetico'],
-                $categoriasCosmeticoValidas,
-                true
-            )
-        ) {
-            $erros[] = 'Selecione uma categoria de cosmético válida.';
-        }
-
-        $unidadesValidas = ['ml', 'g', 'un'];
-
-        if (
-            !in_array(
-                $valores['quantidade_unidade'],
-                $unidadesValidas,
-                true
-            )
-        ) {
-            $erros[] = 'Selecione uma unidade válida.';
-        }
-
-        if (
-            $valores['quantidade_valor'] !== '' &&
-            (!is_numeric($valores['quantidade_valor']) ||
-             $valores['quantidade_valor'] < 0)
-        ) {
-            $erros[] = 'Informe uma quantidade válida para o cosmético.';
-        }
-    }
-
-    if ($valores['categoria'] === 'brinquedo') {
-
-        if ($valores['classificacao_brinquedo'] === '') {
-            $erros[] = 'Informe a classificação indicativa do brinquedo.';
-        }
-    }
-
     if ($valores['categoria'] === 'jogo') {
 
         $modosValidos = [
@@ -240,9 +182,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->beginTransaction();
 
-            /*
-             * Verifica código de barras duplicado
-             */
+            /* Verifica código de barras duplicado */
+
             if ($valores['codigo_barras'] !== '') {
 
                 $stmt = $pdo->prepare(
@@ -300,93 +241,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $produtoId = $id;
 
-                /*
-                 * ==========================
+                /* ==========================
                  * DADOS DA CATEGORIA
-                 * ==========================
-                 */
+                 * ========================== */
+
+                $handlersCategoria = [
+                    'roupa' => new RoupaHandler($pdo),
+                    'cosmetico' => new CosmeticoHandler($pdo),
+                    'brinquedo' => new BrinquedoHandler($pdo),
+                ];
+
+                if (isset($handlersCategoria[$valores['categoria']])) {
+
+                    $handlersCategoria[$valores['categoria']]->salvar($produtoId, $valores, true);
+
+                } else {
 
                 switch ($valores['categoria']) {
-
-                    case 'roupa':
-
-                        $stmt = $pdo->prepare(
-                            'UPDATE roupas SET
-                                tamanho = :tamanho,
-                                marca = :marca,
-                                sexo = :sexo
-                            WHERE produto_id = :produto_id'
-                        );
-
-                        $stmt->execute([
-                            'produto_id' => $produtoId,
-                            'tamanho' => $valores['tamanho'],
-                            'marca' => $valores['marca_roupa'] !== ''
-                                ? $valores['marca_roupa']
-                                : null,
-                            'sexo' => $valores['sexo']
-                        ]);
-
-                        break;
-
-                    case 'cosmetico':
-
-                        $stmt = $pdo->prepare(
-                            'UPDATE cosmeticos SET
-                                categoria_cosmetico = :categoria_cosmetico,
-                                tom_cor = :tom_cor,
-                                quantidade_valor = :quantidade_valor,
-                                quantidade_unidade = :quantidade_unidade,
-                                modo_aplicacao = :modo_aplicacao,
-                                registro_anvisa = :registro_anvisa
-                            WHERE produto_id = :produto_id'
-                        );
-
-                        $stmt->execute([
-                            'produto_id' => $produtoId,
-                            'categoria_cosmetico' => $valores['categoria_cosmetico'],
-                            'tom_cor' => $valores['tom_cor'] !== ''
-                                ? $valores['tom_cor']
-                                : null,
-                            'quantidade_valor' => $valores['quantidade_valor'] !== ''
-                                ? $valores['quantidade_valor']
-                                : null,
-                            'quantidade_unidade' => $valores['quantidade_unidade'],
-                            'modo_aplicacao' => $valores['modo_aplicacao'] !== ''
-                                ? $valores['modo_aplicacao']
-                                : null,
-                            'registro_anvisa' => $valores['registro_anvisa'] !== ''
-                                ? $valores['registro_anvisa']
-                                : null
-                        ]);
-
-                        break;
-
-                    case 'brinquedo':
-
-                        $stmt = $pdo->prepare(
-                            'UPDATE brinquedos SET
-                                classificacao_indicativa = :classificacao_indicativa,
-                                marca = :marca,
-                                colecao = :colecao
-                            WHERE produto_id = :produto_id'
-                        );
-
-                        $stmt->execute([
-                            'produto_id' => $produtoId,
-                            'classificacao_indicativa' =>
-                                $valores['classificacao_brinquedo'],
-                            'marca' =>
-                                $valores['marca_brinquedo'] !== ''
-                                    ? $valores['marca_brinquedo']
-                                    : null,
-                            'colecao' =>
-                                $valores['colecao'] !== ''
-                                    ? $valores['colecao']
-                                    : null
-                        ]);
-
-                        break;
 
                     case 'jogo':
 
@@ -457,6 +328,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                 }
 
+                }
+
                 $pdo->commit();
 
                 $sucesso = 'Produto atualizado com sucesso!';
@@ -465,6 +338,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($erros) && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
+
+        } catch (ValidacaoException $e) {
+
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            $erros = array_merge($erros, $e->getErros());
 
         } catch (PDOException $e) {
 

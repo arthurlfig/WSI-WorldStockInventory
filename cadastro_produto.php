@@ -1,4 +1,7 @@
 <?php require_once __DIR__ . '/auth.php'; exigirLogin(); require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/template_method/RoupaHandler.php';
+require_once __DIR__ . '/template_method/CosmeticoHandler.php';
+require_once __DIR__ . '/template_method/BrinquedoHandler.php';
 
 $erros = [];
 $sucesso = '';
@@ -117,68 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      * ==========================
      * VALIDAÇÕES ESPECÍFICAS
      * ==========================
-     */
-
-    if ($valores['categoria'] === 'roupa') {
-
-        if ($valores['tamanho'] === '') {
-            $erros[] = 'Informe o tamanho da roupa.';
-        }
-
-        $sexosValidos = ['masculino', 'feminino', 'unissex'];
-
-        if (!in_array($valores['sexo'], $sexosValidos, true)) {
-            $erros[] = 'Selecione um sexo válido para a roupa.';
-        }
-    }
-
-    if ($valores['categoria'] === 'cosmetico') {
-
-        $categoriasCosmeticoValidas = [
-            'perfume',
-            'maquiagem',
-            'skincare',
-            'capilar',
-            'cuidados_pessoais'
-        ];
-
-        if (
-            !in_array(
-                $valores['categoria_cosmetico'],
-                $categoriasCosmeticoValidas,
-                true
-            )
-        ) {
-            $erros[] = 'Selecione uma categoria de cosmético válida.';
-        }
-
-        $unidadesValidas = ['ml', 'g', 'un'];
-
-        if (
-            !in_array(
-                $valores['quantidade_unidade'],
-                $unidadesValidas,
-                true
-            )
-        ) {
-            $erros[] = 'Selecione uma unidade válida.';
-        }
-
-        if (
-            $valores['quantidade_valor'] !== '' &&
-            (!is_numeric($valores['quantidade_valor']) ||
-             $valores['quantidade_valor'] < 0)
-        ) {
-            $erros[] = 'Informe uma quantidade válida para o cosmético.';
-        }
-    }
-
-    if ($valores['categoria'] === 'brinquedo') {
-
-        if ($valores['classificacao_brinquedo'] === '') {
-            $erros[] = 'Informe a classificação indicativa do brinquedo.';
-        }
-    }
 
     if ($valores['categoria'] === 'jogo') {
 
@@ -286,123 +227,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $produtoId = $pdo->lastInsertId();
 
-                /*
-                 * ==========================
-                 * DADOS DA CATEGORIA
-                 * ==========================
-                 */
+                $handlersCategoria = [
+                    'roupa' => new RoupaHandler($pdo),
+                    'cosmetico' => new CosmeticoHandler($pdo),
+                    'brinquedo' => new BrinquedoHandler($pdo),
+                ];
+
+                if (isset($handlersCategoria[$valores['categoria']])) {
+
+                    $handlersCategoria[$valores['categoria']]->salvar($produtoId, $valores, false);
+
+                } else {
 
                 switch ($valores['categoria']) {
-
-                    case 'roupa':
-
-                        $stmt = $pdo->prepare(
-                            'INSERT INTO roupas
-                            (
-                                produto_id,
-                                tamanho,
-                                marca,
-                                sexo
-                            )
-                            VALUES
-                            (
-                                :produto_id,
-                                :tamanho,
-                                :marca,
-                                :sexo
-                            )'
-                        );
-
-                        $stmt->execute([
-                            'produto_id' => $produtoId,
-                            'tamanho' => $valores['tamanho'],
-                            'marca' => $valores['marca_roupa'] !== ''
-                                ? $valores['marca_roupa']
-                                : null,
-                            'sexo' => $valores['sexo']
-                        ]);
-
-                        break;
-
-                    case 'cosmetico':
-
-                        $stmt = $pdo->prepare(
-                            'INSERT INTO cosmeticos
-                            (
-                                produto_id,
-                                categoria_cosmetico,
-                                tom_cor,
-                                quantidade_valor,
-                                quantidade_unidade,
-                                modo_aplicacao,
-                                registro_anvisa
-                            )
-                            VALUES
-                            (
-                                :produto_id,
-                                :categoria_cosmetico,
-                                :tom_cor,
-                                :quantidade_valor,
-                                :quantidade_unidade,
-                                :modo_aplicacao,
-                                :registro_anvisa
-                            )'
-                        );
-
-                        $stmt->execute([
-                            'produto_id' => $produtoId,
-                            'categoria_cosmetico' => $valores['categoria_cosmetico'],
-                            'tom_cor' => $valores['tom_cor'] !== ''
-                                ? $valores['tom_cor']
-                                : null,
-                            'quantidade_valor' => $valores['quantidade_valor'] !== ''
-                                ? $valores['quantidade_valor']
-                                : null,
-                            'quantidade_unidade' => $valores['quantidade_unidade'],
-                            'modo_aplicacao' => $valores['modo_aplicacao'] !== ''
-                                ? $valores['modo_aplicacao']
-                                : null,
-                            'registro_anvisa' => $valores['registro_anvisa'] !== ''
-                                ? $valores['registro_anvisa']
-                                : null
-                        ]);
-
-                        break;
-
-                    case 'brinquedo':
-
-                        $stmt = $pdo->prepare(
-                            'INSERT INTO brinquedos
-                            (
-                                produto_id,
-                                classificacao_indicativa,
-                                marca,
-                                colecao
-                            )
-                            VALUES
-                            (
-                                :produto_id,
-                                :classificacao_indicativa,
-                                :marca,
-                                :colecao
-                            )'
-                        );
-
-                        $stmt->execute([
-                            'produto_id' => $produtoId,
-                            'classificacao_indicativa' =>
-                                $valores['classificacao_brinquedo'],
-                            'marca' =>
-                                $valores['marca_brinquedo'] !== ''
-                                    ? $valores['marca_brinquedo']
-                                    : null,
-                            'colecao' =>
-                                $valores['colecao'] !== ''
-                                    ? $valores['colecao']
-                                    : null
-                        ]);
-
-                        break;
 
                     case 'jogo':
 
@@ -494,6 +331,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                 }
 
+                }
+
                 $pdo->commit();
 
                 $sucesso = 'Produto cadastrado com sucesso!';
@@ -513,6 +352,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($erros) && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
+
+        } catch (ValidacaoException $e) {
+
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            $erros = array_merge($erros, $e->getErros());
 
         } catch (PDOException $e) {
 

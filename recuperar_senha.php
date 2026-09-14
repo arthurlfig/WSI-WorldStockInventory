@@ -9,6 +9,7 @@ $erro = '';
 $linkRedefinicao = '';
 
 /* Mensagem sempre igual, exista ou não o e-mail - evita que alguém descubra quais e-mails têm conta só testando este formulário. */
+
 $mensagemPadrao = 'Se existir uma conta com esse e-mail, um link de redefinição de senha foi gerado.';
 $mostrarMensagemPadrao = false;
 
