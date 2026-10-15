@@ -1,0 +1,11 @@
+# Dependencias instaladas pelo Composer
+/vendor/
+
+# Artefatos gerados pelo build (publique-os em um Release, nao no git)
+/dist/
+
+# Arquivos de sistema/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,28 @@
+{
+    "name": "wsi/core",
+    "description": "Camada reutilizavel do WorldStockInventory: conexao Singleton com o banco, repositorios (Produto, Usuario, Fornecedor) e handlers Template Method por categoria de produto.",
+    "type": "library",
+    "keywords": ["estoque", "inventario", "repository", "singleton", "template-method", "pdo"],
+    "license": "MIT",
+    "authors": [
+        { "name": "Equipe WorldStockInventory" }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*"
+    },
+    "autoload": {
+        "classmap": [
+            "config/database.php",
+            "repositories/",
+            "template_method/"
+        ]
+    },
+    "scripts": {
+        "build": "php -d phar.readonly=0 build/build-phar.php"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
