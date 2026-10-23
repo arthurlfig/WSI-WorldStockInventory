@@ -117,7 +117,7 @@ $valoresSemana = array_values($vendasPorDia);
         <div class="stat-card">
             <p class="stat-label">Lotes vencendo</p>
             <p class="stat-value <?= $lotesVencendo > 0 ? 'stat-warn' : '' ?>"><?= $lotesVencendo ?></p>
-            <p class="stat-hint">Vencidos ou nos próximos 30 dias</p>
+            <p class="stat-hint">Vencidos ou nos próximos 30 dias · <a href="lotes_vencimento.php" style="color: var(--accent);">ver lotes</a></p>
         </div>
         <div class="stat-card">
             <p class="stat-label">Vendas hoje</p>

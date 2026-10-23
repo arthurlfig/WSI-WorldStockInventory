@@ -268,6 +268,7 @@ $ultimasEntradas = $pdo->query(
                             <th>Custo unit.</th>
                             <th>Validade</th>
                             <th>Registrado em</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -280,6 +281,10 @@ $ultimasEntradas = $pdo->query(
                                 <td><?= $e['preco_custo'] !== null ? 'R$ ' . number_format((float)$e['preco_custo'], 2, ',', '.') : '—' ?></td>
                                 <td><?= $e['data_validade'] ? htmlspecialchars(date('d/m/Y', strtotime($e['data_validade']))) : '—' ?></td>
                                 <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($e['criado_em']))) ?></td>
+                                <td style="white-space:nowrap;">
+                                    <a href="editar_lote.php?id=<?= (int)$e['id'] ?>" class="btn btn--ghost btn--sm">Editar</a>
+                                    <a href="excluir_lote.php?id=<?= (int)$e['id'] ?>" class="btn btn--ghost btn--sm">Excluir</a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

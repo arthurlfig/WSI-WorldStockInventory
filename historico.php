@@ -1,6 +1,7 @@
 <?php require_once __DIR__ . '/auth.php'; exigirLogin();
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/partials/movimentacao_helpers.php';
 
 $pdo = Database::getConnection();
 
@@ -47,8 +48,10 @@ if ($aba === 'estoque') {
         $parametros['tipo'] = $tipo;
     }
 
-    $sql = "SELECT m.id, m.tipo, m.quantidade, m.motivo, m.data_movimentacao,
-                   p.nome AS produto_nome, l.numero_lote, u.nome AS usuario_nome
+    $sql = "SELECT m.id, m.tipo, m.quantidade, m.motivo, m.data_movimentacao, m.lote_id,
+                   p.nome AS produto_nome, l.numero_lote, u.nome AS usuario_nome,
+                   (SELECT COUNT(*) FROM estoque_movimentacoes x
+                     WHERE x.motivo LIKE CONCAT('Estorno da movimentação #', m.id, ':%')) AS ja_estornada
             FROM estoque_movimentacoes m
             JOIN produtos p ON p.id = m.produto_id
             LEFT JOIN lotes l ON l.id = m.lote_id
@@ -191,6 +194,7 @@ if ($aba === 'estoque') {
                                 <th>Qtde.</th>
                                 <th>Motivo</th>
                                 <th>Usuário</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -207,6 +211,16 @@ if ($aba === 'estoque') {
                                     <td><?= (int)$m['quantidade'] ?></td>
                                     <td><?= htmlspecialchars($m['motivo'] ?: '—') ?></td>
                                     <td><?= htmlspecialchars($m['usuario_nome'] ?: '—') ?></td>
+                                    <td style="white-space:nowrap;">
+                                        <?php if (!motivoReservado($m['motivo'])): ?>
+                                            <a href="editar_movimentacao.php?id=<?= (int)$m['id'] ?>" class="btn btn--ghost btn--sm">Editar motivo</a>
+                                            <?php if ($m['lote_id'] !== null && (int)$m['ja_estornada'] === 0): ?>
+                                                <a href="estornar_movimentacao.php?id=<?= (int)$m['id'] ?>" class="btn btn--ghost btn--sm">Estornar</a>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            —
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -228,6 +242,7 @@ if ($aba === 'estoque') {
                                 <th>Pagamento</th>
                                 <th>Status</th>
                                 <th>Usuário</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -244,6 +259,14 @@ if ($aba === 'estoque') {
                                         </span>
                                     </td>
                                     <td><?= htmlspecialchars($v['usuario_nome'] ?: '—') ?></td>
+                                    <td style="white-space:nowrap;">
+                                        <?php if ($v['status'] !== 'cancelada'): ?>
+                                            <a href="editar_venda.php?id=<?= (int)$v['id'] ?>" class="btn btn--ghost btn--sm">Editar</a>
+                                            <a href="cancelar_venda.php?id=<?= (int)$v['id'] ?>" class="btn btn--ghost btn--sm">Cancelar</a>
+                                        <?php else: ?>
+                                            —
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
